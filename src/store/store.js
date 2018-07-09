@@ -33,32 +33,21 @@ export const store = new Vuex.Store({
     },
     getFirestoreDataHistory(state) {
       //trae la data de firestore y la carga en el state
-      firebaseApp.firestore().collection("history")
-      .onSnapshot(function(querySnapshot) {
-        console.log(querySnapshot);
-        querySnapshot.forEach((doc) => {
+      firebaseApp.firestore().collection("history").orderBy("idOrder", "asc").limit(15)
+      .onSnapshot((querySnapshot) => {
+        //ya que esto se ejecuta cada que hay cambios, si no se elimina todo el historial del state, duplicaria todo el historial
+        state.history = []
+        querySnapshot.forEach(function(doc) {
           state.history.push({
             id: doc.data().id,
             created: doc.data().created,
             sender: doc.data().sender,
             newMessage: doc.data().newMessage
           })
-        });
-      }, function(error) {
-        //...
-      });
 
-
-      firebaseApp.firestore().collection("history").get().then((querySnapshot) => {
-        querySnapshot.forEach((doc) => {
-          state.history.push({
-            id: doc.data().id,
-            created: doc.data().created,
-            sender: doc.data().sender,
-            newMessage: doc.data().newMessage
-          })
         });
-      });
+      })
+
     },
     nameUser(state, name) {
       //agrega el nombre del usuario en firestore y en currentUser
@@ -83,22 +72,13 @@ export const store = new Vuex.Store({
     },
     addNewMessage(state, {created, sender, newMessage}) {
       firebaseApp.firestore().collection("history").add({
+        idOrder: Date.now(),
         created: created,
         sender: sender,
         newMessage: newMessage
       })
       .then(function(docRef) {
-        /*Vue.set(state, 'currentUser', {
-          name: name,
-          id: docRef.id
-        })*/
-        state.history.push({
-        created: created,
-        sender: sender,
-        newMessage: newMessage
-
-        })
-        console.log("state.history: ", state.history);
+        console.log("addNewMessage: ", state.history);
       })
       .catch(function(error) {
         console.error("Error adding document: ", error);

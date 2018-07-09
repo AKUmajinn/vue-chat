@@ -10,9 +10,9 @@
     components: {
       Welcome
     },
-    updated(){
+    created(){
       this.$store.dispatch('getFirestoreDataUsers');
       this.$store.dispatch('getFirestoreDataHistory');
-    },
+    }
   }
 </script>
