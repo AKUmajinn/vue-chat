@@ -1,12 +1,13 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
-import Firebase from 'Firebase'
+const fb = require('../firebase/firebase.config.js')
+/*import Firebase from 'Firebase'
 import 'Firebase/firestore'
-import config from '../firebase/firebase.config.js'
+import config from '../firebase/firebase.config.js'*/
 
-const firebaseApp = Firebase.initializeApp(config)
+/*const firebaseApp = Firebase.initializeApp(config)
 
-firebaseApp.firestore().settings({ timestampsInSnapshots: true})
+fb.db.settings({ timestampsInSnapshots: true})*/
 
 Vue.use(Vuex);
 
@@ -21,7 +22,7 @@ export const store = new Vuex.Store({
     getFirestoreDataUsers(state) {
       //trae la data de firestore y la carga en el state
 
-      firebaseApp.firestore().collection("users").get().then((querySnapshot) => {
+      fb.db.collection("users").get().then((querySnapshot) => {
         querySnapshot.forEach((doc) => {
           state.users.push({
             id: doc.id,
@@ -33,7 +34,7 @@ export const store = new Vuex.Store({
     },
     getFirestoreDataHistory(state) {
       //trae la data de firestore y la carga en el state
-      firebaseApp.firestore().collection("history").orderBy("idOrder", "asc").limit(15)
+      fb.db.collection("history").orderBy("idOrder", "asc").limit(15)
       .onSnapshot((querySnapshot) => {
         //ya que esto se ejecuta cada que hay cambios, si no se elimina todo el historial del state, duplicaria todo el historial
         state.history = []
@@ -51,7 +52,7 @@ export const store = new Vuex.Store({
     },
     nameUser(state, name) {
       //agrega el nombre del usuario en firestore y en currentUser
-      firebaseApp.firestore().collection("users").add({
+      fb.db.collection("users").add({
         name: name
       })
       .then(function(docRef) {
@@ -71,7 +72,7 @@ export const store = new Vuex.Store({
       });
     },
     addNewMessage(state, {created, sender, newMessage}) {
-      firebaseApp.firestore().collection("history").add({
+      fb.db.collection("history").add({
         idOrder: Date.now(),
         created: created,
         sender: sender,
